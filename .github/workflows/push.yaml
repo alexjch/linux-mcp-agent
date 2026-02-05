@@ -1,0 +1,29 @@
+name: Push CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: make dev
+
+    - name: Format
+      run: make format
+
+    - name: Lint
+      run: make lint
+  
+    - name: Test
+      run: make test

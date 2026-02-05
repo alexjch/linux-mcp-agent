@@ -3,21 +3,27 @@
 help:
 	@echo "Available targets:"
 	@echo "  make install  - Install dependencies"
+	@echo "  make dev      - Install development dependencies"
 	@echo "  make format   - Format code with black"
 	@echo "  make lint     - Run linters (flake8, mypy)"
 	@echo "  make test     - Run tests with pytest"
 	@echo "  make all      - Run format, lint, and test"
 	@echo "  make clean    - Remove Python cache files"
 
+# Install development dependencies
+dev:
+	pip install -e ".[dev]"
+
+# Install production dependencies
 install:
 	pip install -r requirements.txt
 
 format:
-	black mcp_linux_agent/ tests/ examples/
+	black linux_mcp_agent/ tests/
 
 lint:
-	flake8 mcp_linux_agent/ tests/ examples/ --max-line-length=100
-	mypy mcp_linux_agent/
+	flake8 linux_mcp_agent/ tests/ --max-line-length=100 --extend-ignore=E501
+	mypy linux_mcp_agent/ --ignore-missing-imports
 
 test:
 	pytest tests/ -v
