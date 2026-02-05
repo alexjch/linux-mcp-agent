@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-dnf install git python3 python3-pip -y
+dnf install git python3 python3-pip make -y
 python -m venv .venv
 echo 'source /workspace/.venv/bin/activate' >> ~/.bashrc
 .venv/bin/pip3 install --upgrade pip
