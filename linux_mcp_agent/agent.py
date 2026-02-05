@@ -13,7 +13,7 @@ console = Console()
 
 async def get_tool_list() -> Any:
     """
-    Asynchronously initialize an MCP (Model Context Protocol) client and retrieve 
+    Asynchronously initialize an MCP (Model Context Protocol) client and retrieve
     the list of available tools from the configured MCP server.
 
     Returns:
