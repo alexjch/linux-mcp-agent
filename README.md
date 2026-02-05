@@ -1,6 +1,6 @@
 # mcp-linux-agent
 
-Client for [Linux MCP server](https://github.com/rhel-lightspeed/linux-mcp-server)
+A lightweight CLI client for the [Linux MCP server](https://github.com/rhel-lightspeed/linux-mcp-server). Unlike graphical alternatives, this tool runs on headless servers without requiring X11 or other display libraries, enabling interactive Linux system diagnostics directly from the terminal.
 
 ## Features
 
