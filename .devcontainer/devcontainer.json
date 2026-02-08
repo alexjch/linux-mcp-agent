@@ -1,35 +1,46 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/anaconda
 {
-	"name": "Fedora 41",
-	"image": "registry.fedoraproject.org/fedora:41",
-	
+	"name": "linux-mcp-agent-devcontainer",
+	"build": {
+		"dockerfile": "Containerfile",
+		"context": "."
+	},
 	"workspaceFolder": "/workspace",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached,z",
-	
 	"runArgs": [
+		"--userns=keep-id",
+		"--security-opt=label=disable",
 		"--name=linux-mcp-agent-devcontainer",
-		"--rm",
-		"-e 'PYTHONPATH=/workspace/.'",
 		"--network=host"
 	],
-	
+	"containerUser": "vscode",
 	"containerEnv": {
 		"PYTHONPATH": "/workspace/."
 	},
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash .devcontainer/setup.sh"
-
-	// Configure tool-specific properties.
-	// "customizations": {}
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.debugpy",
+				"ms-python.python",
+				"ms-python.vscode-pylance"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+				"python.terminal.activateEnvironment": true,
+				"editor.formatOnSave": true,
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"fish": {
+						"path": "/usr/bin/bash"
+					}
+				},
+				"[python]": {
+					"editor.codeActionsOnSave": {
+						"source.fixAll": "explicit",
+						"source.organizeImports": "explicit"
+					}
+				}
+			}
+		}
+	},
+	"postCreateCommand": "pip3 install -r requirements.txt"
 }
