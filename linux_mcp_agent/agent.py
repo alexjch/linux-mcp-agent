@@ -1,33 +1,15 @@
 import asyncio
 import requests
-from typing import Any
 from linux_mcp_agent.config import config, SYSTEM_PROMPT
-from llama_index.tools.mcp import BasicMCPClient, McpToolSpec  # type: ignore[import-untyped]
+from llama_index.tools.mcp import McpToolSpec  # type: ignore[import-untyped]
 from llama_index.core.agent.workflow import FunctionAgent
 from rich.console import Console
 from rich.prompt import Prompt
 from llama_index.llms.ollama import Ollama  # type: ignore[import-untyped]
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
 
 console = Console()
-
-
-async def get_tool_list() -> Any:
-    """
-    Asynchronously initialize an MCP (Model Context Protocol) client and retrieve
-    the list of available tools from the configured MCP server.
-
-    Returns:
-        Any: A list of tool specifications available from the MCP server.
-
-    Raises:
-        ConnectionError: If unable to connect to the MCP server.
-        ValueError: If the MCP server configuration is invalid.
-    """
-    """Initialize MCP client and retrieve available tools from the MCP server."""
-    mcp_client = BasicMCPClient(config.linux_mcp_server)
-    mcp_tool_spec = McpToolSpec(client=mcp_client)
-    tools = await mcp_tool_spec.to_tool_list_async()
-    return tools
 
 
 async def check_required_models() -> bool:
@@ -74,10 +56,10 @@ async def pull_model() -> bool:
         resp.raise_for_status()
         return True
     except requests.exceptions.HTTPError as e:
-        print(f"HTTP error occurred while pulling model: {e}")
+        console.print(f"[red]HTTP error occurred while pulling model: {e}[/red]")
         return False
     except requests.exceptions.RequestException as e:
-        print(f"Failed to pull model from Ollama: {e}")
+        console.print(f"[red]Failed to pull model from Ollama: {e}[/red]")
         return False
 
 
@@ -109,6 +91,7 @@ async def start_chat() -> int:
 
     Initializes the LLM and agent, then enters a loop accepting user input
     and displaying agent responses until the user exits or interrupts.
+    The MCP client connection is maintained throughout the session for efficiency.
 
     Returns:
         int: Exit code (0 for successful completion).
@@ -117,28 +100,39 @@ async def start_chat() -> int:
         model=config.llm_model, base_url=config.llm_base_url, request_timeout=config.request_timeout
     )
 
-    tools = await get_tool_list()
-
-    agent = FunctionAgent(
-        tools=tools,
-        llm=llm,
-        system_prompt=SYSTEM_PROMPT,
+    server_params = StdioServerParameters(
+        command=config.linux_mcp_server,
+        args=[],
     )
 
-    while True:
-        try:
-            user_input = Prompt.ask("[bold cyan]You[/bold cyan]")
-            if user_input.lower() in ("exit", "quit"):
-                console.print("[yellow]Goodbye![/yellow]")
-                break
+    # Keep MCP client alive for the entire session
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as client:
+            # Initialize the connection
+            await client.initialize()
+            mcp_tool_spec = McpToolSpec(client=client)
+            tools = await mcp_tool_spec.to_tool_list_async()
 
-            response = await agent.run(user_input)  # type: ignore
-            console.print(f"[bold green]Agent[/bold green]: {response}")
-        except KeyboardInterrupt:
-            console.print("\n[yellow]Interrupted[/yellow]")
-            break
-        except Exception as e:
-            console.print(f"[red]Error: {e}[/red]")
+            agent = FunctionAgent(
+                tools=tools,
+                llm=llm,
+                system_prompt=SYSTEM_PROMPT,
+            )
+
+            while True:
+                try:
+                    user_input = Prompt.ask("[bold cyan]You[/bold cyan]")
+                    if user_input.lower() in ("exit", "quit"):
+                        console.print("[yellow]Goodbye![/yellow]")
+                        break
+
+                    response = await agent.run(user_input)  # type: ignore
+                    console.print(f"[bold green]Agent[/bold green]: {response}")
+                except KeyboardInterrupt:
+                    console.print("\n[yellow]Interrupted[/yellow]")
+                    break
+                except Exception as e:
+                    console.print(f"[red]Error: {e}[/red]")
     return 0
 
 
@@ -149,10 +143,12 @@ async def main() -> int:
     Provisions required models and starts the interactive chat session.
 
     Returns:
-        int: Exit code from start_chat().
+        int: Exit code (0 for success, non-zero for failure).
     """
     if not await provision_models():
-        console.print(f"[red]Model {config.llm_model} is not available")
+        console.print(f"[red]Model {config.llm_model} is not available[/red]")
+        # Return a non-zero exit code to indicate provisioning failure and avoid starting chat.
+        return 1
 
     return await start_chat()
 

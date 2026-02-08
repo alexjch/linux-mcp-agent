@@ -1,6 +1,6 @@
 # mcp-linux-agent
 
-A lightweight CLI client for the [Linux MCP server](https://github.com/rhel-lightspeed/linux-mcp-server). Unlike graphical alternatives, this tool runs on headless servers without requiring X11 or other display libraries, enabling interactive Linux system diagnostics directly from the terminal.
+A lightweight CLI client for the [Linux MCP server](https://github.com/rhel-lightspeed/linux-mcp-server). This tool runs on headless servers without requiring X11 or other display libraries, enabling interactive Linux system diagnostics directly from the terminal.
 
 ## Features
 
@@ -12,7 +12,7 @@ A lightweight CLI client for the [Linux MCP server](https://github.com/rhel-ligh
 
 ## Prerequisites
 
-- Python 3.9+
+- Python 3.10+
 - [Ollama](https://ollama.ai) running locally (default: http://localhost:11434)
 - [linux-mcp-server](https://github.com/modelcontextprotocol/servers) installed
 
@@ -33,25 +33,21 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Install linux-mcp-server
 pip install linux-mcp-server
 ```
 
 ## Configuration
 
-Configure via environment variables or use defaults:
+Configure via environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LINUX_MCP_SERVER` | `.bin/linux-mcp-server` | Path to MCP server executable |
+| `LINUX_MCP_SERVER` | `.venv/bin/linux-mcp-server` | Path to MCP server executable |
 | `LLM_MODEL` | `llama3.2:latest` | Ollama model to use |
 | `LLM_BASE_URL` | `http://localhost:11434` | Ollama server URL |
 | `REQUEST_TIMEOUT` | `90` | Request timeout in seconds |
 
 ## Usage
-
-### Run the Agent
 
 ```bash
 # As a module
@@ -76,7 +72,7 @@ Goodbye!
 
 ## Development
 
-### Available Make Targets
+### Make Targets
 
 ```bash
 make install   # Install dependencies
@@ -108,7 +104,7 @@ The agent uses:
 - **Ollama**: Local LLM inference
 - **Rich**: Terminal UI formatting
 
-The agent operates in read-only mode, gathering system diagnostics without making modifications.
+The agent operates in read-only mode, preventing system modifications.
 
 ## License
 
