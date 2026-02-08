@@ -16,7 +16,7 @@ When in doubt, prefer additional read-only queries over speculative recommendati
 class Config:
     """Application configuration loaded from environment variables."""
 
-    DEFAULT_LINUX_MCP_SERVER = ".bin/linux-mcp-server"
+    DEFAULT_LINUX_MCP_SERVER = ".venv/bin/linux-mcp-server"
     DEFAULT_LLM_MODEL = "llama3.2:latest"
     DEFAULT_LLM_BASE_URL = "http://localhost:11434"
     DEFAULT_REQUEST_TIMEOUT = "90"

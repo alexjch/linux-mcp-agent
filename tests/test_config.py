@@ -6,7 +6,7 @@ from linux_mcp_agent.config import Config, SYSTEM_PROMPT
 def test_config_defaults():
     """Test that config loads default values correctly."""
     config = Config()
-    assert config.linux_mcp_server == ".bin/linux-mcp-server"
+    assert config.linux_mcp_server == ".venv/bin/linux-mcp-server"
     assert config.llm_model == "llama3.2:latest"
     assert config.llm_base_url == "http://localhost:11434"
     assert config.request_timeout == 90
