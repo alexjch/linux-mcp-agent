@@ -43,9 +43,30 @@ Configure via environment variables:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `LINUX_MCP_SERVER` | `.venv/bin/linux-mcp-server` | Path to MCP server executable |
-| `LLM_MODEL` | `llama3.2:latest` | Ollama model to use |
-| `LLM_BASE_URL` | `http://localhost:11434` | Ollama server URL |
+| `LLM_PROVIDER` | `ollama` | LLM backend (`ollama` or `googlegenai`) |
+| `LLM_MODEL` | `llama3.2:latest` | Model name for the selected backend |
+| `LLM_BASE_URL` | `http://localhost:11434` | Ollama server URL (used when `LLM_PROVIDER=ollama`) |
 | `REQUEST_TIMEOUT` | `90` | Request timeout in seconds |
+
+### Provider Examples
+
+Use one of the following configurations before starting the agent.
+
+#### Ollama (local)
+
+```bash
+export LLM_PROVIDER=ollama
+export LLM_MODEL=llama3.2:latest
+export LLM_BASE_URL=http://localhost:11434
+```
+
+#### Google GenAI
+
+```bash
+export LLM_PROVIDER=googlegenai
+export LLM_MODEL=gemini-2.0-flash
+export GOOGLE_API_KEY=your_api_key_here
+```
 
 ## Usage
 
