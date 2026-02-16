@@ -1,11 +1,11 @@
 import asyncio
 import requests
 from linux_mcp_agent.config import config, SYSTEM_PROMPT
+from linux_mcp_agent.model import init_llm
 from llama_index.tools.mcp import McpToolSpec  # type: ignore[import-untyped]
 from llama_index.core.agent.workflow import FunctionAgent
 from rich.console import Console
 from rich.prompt import Prompt
-from llama_index.llms.ollama import Ollama  # type: ignore[import-untyped]
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -78,6 +78,10 @@ async def provision_models() -> bool:
         None explicitly, but may raise exceptions from check_required_models()
         or pull_model() if they are not properly handled internally.
     """
+    # Only Ollama requires local model provisioning.
+    if config.llm_provider != "ollama":
+        return True
+
     if not await check_required_models():
         console.print(f"[red]Required model '{config.llm_model}' not found in Ollama[/red]")
         console.print(f"[yellow]Attempting to pull model '{config.llm_model}'...[/yellow]")
@@ -96,9 +100,7 @@ async def start_chat() -> int:
     Returns:
         int: Exit code (0 for successful completion).
     """
-    llm = Ollama(
-        model=config.llm_model, base_url=config.llm_base_url, request_timeout=config.request_timeout
-    )
+    llm = init_llm()
 
     server_params = StdioServerParameters(
         command=config.linux_mcp_server,
