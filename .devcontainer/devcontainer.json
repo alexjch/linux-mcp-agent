@@ -7,6 +7,7 @@
 	"workspaceFolder": "/workspace",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached,z",
 	"runArgs": [
+		"--rm",
 		"--userns=keep-id",
 		"--security-opt=label=disable",
 		"--name=linux-mcp-agent-devcontainer",
