@@ -53,3 +53,15 @@ def test_config_valid_timeout_string(monkeypatch):
 
     assert config.request_timeout == 150
     assert isinstance(config.request_timeout, int)
+
+
+def test_config_invalid_llm_provider(monkeypatch, capsys):
+    """Test that invalid provider falls back to the default provider."""
+    monkeypatch.setenv("LLM_PROVIDER", "unknown-provider")
+
+    config = Config()
+
+    assert config.llm_provider == "ollama"
+
+    captured = capsys.readouterr()
+    assert "Invalid LLM_PROVIDER value" in captured.err

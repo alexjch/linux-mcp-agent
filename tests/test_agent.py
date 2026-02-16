@@ -98,3 +98,15 @@ async def test_provision_models_pull_fails():
         with patch("linux_mcp_agent.agent.pull_model", return_value=False):
             result = await provision_models()
             assert result is False
+
+
+@pytest.mark.asyncio
+async def test_provision_models_non_ollama_provider(monkeypatch):
+    """Test provisioning is skipped when provider does not require local model pull."""
+    monkeypatch.setattr("linux_mcp_agent.agent.config.llm_provider", "googlegenai")
+
+    with patch("linux_mcp_agent.agent.check_required_models") as check_required:
+        result = await provision_models()
+
+    assert result is True
+    check_required.assert_not_called()
