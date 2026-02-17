@@ -1,7 +1,7 @@
+"""Configuration settings for the application."""
+
 import os
 import sys
-
-"""Configuration settings for the application."""
 
 SYSTEM_PROMPT = """
 You are an autonomous troubleshooting agent with read-only access to target Linux hosts via a Model Context Protocol (MCP) diagnostics server. Use the server’s provided tools to gather facts, diagnose problems, and produce safe, actionable guidance. Never attempt to modify files, run write operations, or instruct the server to perform destructive actions. Follow these rules for every session:
@@ -25,7 +25,9 @@ class Config:
     def __init__(self) -> None:
         """Initialize configuration from environment variables with validation."""
         self.linux_mcp_server: str = os.getenv("LINUX_MCP_SERVER", self.DEFAULT_LINUX_MCP_SERVER)
-        self.llm_provider: str = os.getenv("LLM_PROVIDER", self.DEFAULT_LLM_PROVIDER).strip().lower()
+        self.llm_provider: str = (
+            os.getenv("LLM_PROVIDER", self.DEFAULT_LLM_PROVIDER).strip().lower()
+        )
         self.llm_model: str = os.getenv("LLM_MODEL", self.DEFAULT_LLM_MODEL)
         self.llm_base_url: str = os.getenv("LLM_BASE_URL", self.DEFAULT_LLM_BASE_URL)
 
@@ -41,7 +43,7 @@ class Config:
             )
             self.llm_provider = self.DEFAULT_LLM_PROVIDER
 
-        # Validate and parse request timeout
+        # Validate and parse request timeout with a safe fallback.
         timeout_str = os.getenv("REQUEST_TIMEOUT", self.DEFAULT_REQUEST_TIMEOUT)
         try:
             self.request_timeout: int = int(timeout_str)
