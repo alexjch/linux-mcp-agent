@@ -12,7 +12,7 @@ dependencies = [
     "rich==14.3.2",
     "llama-index==0.14.13",
     "llama-index-llms-ollama==0.9.1",
-    "llama-index-llms-google-genai==0.3.0",
+    "llama-index-llms-google-genai==0.8.7",
     "llama-index-tools-mcp>=0.1.0",
 ]
 
